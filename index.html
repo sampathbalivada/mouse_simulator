@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+
+<body>
+    <!-- <div id="video">
+        <div id="camdemo" style="width: 320px; height: 240px; text-align: center; margin: 0 auto;"></div>
+    </div>
+    <br>
+    <div style="text-align:center;">
+        <input type="button" id="start" value="Start / Shut down camera" onclick="showCamera()" />
+    </div>
+    <div style="text-align:center;">
+        <input type="button" id="start" value="Run Handpose" onclick="runHandposeOnDemand()" />
+    </div> -->
+    <video id="video" playsinline style="
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    width: auto;
+    height: auto;
+    position: absolute;
+    ">
+    </video>
+    <script src="camera.js"></script>
+</body>
+
+</html>

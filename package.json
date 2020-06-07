@@ -1,0 +1,20 @@
+{
+  "name": "hand-mouse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@tensorflow-models/handpose": "0.0.4",
+    "@tensorflow/tfjs-converter": "^1.7.3",
+    "@tensorflow/tfjs-core": "^1.7.3",
+    "robotjs": "^0.6.0",
+    "webcamjs": "^1.0.26"
+  },
+  "devDependencies": {
+    "electron": "^8.2.3",
+    "electron-rebuild": "^1.11.0"
+  }
+}
