@@ -1,13 +1,20 @@
 const handpose = require('@tensorflow-models/handpose');
 const robot = require('robotjs');
 
+// Debugging variables
 var tracking_counter = 0
+
+// Change value to `true` while debugging
+const debugging = false
 
 // Initialize mouse pointer locations
 var pointerX = 0;
 var pointerY = 0;
 var currentPos = null;
 var lastPos = null;
+
+// Mouse click handler variables
+var isClicked = false;
 
 // Get screen Width and Height
 const screenSize = robot.getScreenSize();
@@ -17,11 +24,32 @@ console.log(SCREEN_HEIGHT);
 console.log(SCREEN_WIDTH);
 
 // Set height and width of video stream
-const VIDEO_WIDTH = 640;
-const VIDEO_HEIGHT = 480;
+const VIDEO_WIDTH = 480;
+const VIDEO_HEIGHT = 360;
 
-// Gloabl access for the handpose model
+// Global access for the handpose model
 var model;
+
+// Euclidean Distance Calculator [2 Dimensional]
+// distance = √(x2 - x1)^2 + (y2 - y2)^2
+function EuclideanDistance(pointA, pointB) {
+    if (pointA == undefined || pointB == undefined) {
+        // Theoretically large value incase points are empty
+        return 1000;
+    }
+    return Math.sqrt(Math.pow((pointA[0] - pointB[0]), 2) + Math.pow((pointA[1] - pointB[1]), 2));
+}
+
+// Mouse click registerer
+function registerMouseClick(params) {
+    // if(!isClicked) {
+    isClicked = true;
+    robot.mouseClick();
+    setTimeout(() => {
+        isClicked = false;
+    }, 1000);
+    // }
+}
 
 // Find available camera nd setup the available webcam for handpose
 async function setupCamera() {
@@ -62,7 +90,7 @@ async function loadVideo() {
 // Initiate video capture and handpose detection
 const main = async () => {
     // Initialize handpose model
-    model  = await handpose.load();
+    model = await handpose.load();
     let video;
 
     try {
@@ -83,13 +111,27 @@ const landmarksRealTime = async (video) => {
         const predictions = await model.estimateHands(video);
         if (predictions.length > 0) {
             for (let i = 0; i < predictions.length; i++) {
-                // console.log(predictions[i].annotations);
-                console.log("Tracking Count: " + (tracking_counter++).toString());
-                currentPos = predictions[0].annotations.indexFinger[3];
-                if (currentPos) {
-                    pointerX = SCREEN_WIDTH - ((currentPos[0]/VIDEO_WIDTH)*SCREEN_WIDTH);
-                    pointerY = (currentPos[1]/VIDEO_HEIGHT)*SCREEN_HEIGHT;
+                // Use predictions[0].annotations.<finger>
+                var currentAnnotations = predictions[0].annotations;
+
+                // Move mouse pointer
+                if (debugging) {
+                    console.log("Tracking Count: " + (tracking_counter++).toString());
+                }
+                currentPos = currentAnnotations.ringFinger[3];
+                if (currentPos && EuclideanDistance(currentPos, lastPos) > 12 && !isClicked) {
+                    pointerX = SCREEN_WIDTH - ((currentPos[0] / VIDEO_WIDTH) * SCREEN_WIDTH);
+                    pointerY = (currentPos[1] / VIDEO_HEIGHT) * SCREEN_HEIGHT;
                     robot.moveMouse(pointerX, pointerY);
+                    lastPos = currentPos;
+                }
+
+                // Simulate clicks
+                if (EuclideanDistance(currentAnnotations.indexFinger[3], currentAnnotations.thumb[3]) < 50 && isClicked == false) {
+                    if (debugging) {
+                        console.log('clickRegistered');
+                    }
+                    registerMouseClick();
                 }
             }
         }
@@ -101,4 +143,10 @@ const landmarksRealTime = async (video) => {
     runHandpose();
 }
 
-main();
+function testDistance(params) {
+    console.log(EuclideanDistance([0, 0], [1, 1]));
+}
+
+if(!debugging){
+    main();
+}
