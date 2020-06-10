@@ -10,8 +10,7 @@
     "@tensorflow-models/handpose": "0.0.4",
     "@tensorflow/tfjs-converter": "^1.7.3",
     "@tensorflow/tfjs-core": "^1.7.3",
-    "robotjs": "^0.6.0",
-    "webcamjs": "^1.0.26"
+    "robotjs": "^0.6.0"
   },
   "devDependencies": {
     "electron": "^8.2.3",
